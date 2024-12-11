@@ -1,2 +1,4 @@
 export.json
 *.log
+system_*.txt
+.vscode/launch.json
