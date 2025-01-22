@@ -20,19 +20,22 @@
                             if (item.message.type !== 'intro') {
                                 logs.push({
                                     role: 'assistant',
-                                    text: item.message.txt
+                                    text: item.message.txt,
+                                    timestamp: item.timestamp
                                 })
                             } else {
                                 logs.push({
                                     role: 'system',
-                                    text: item.message.txt
+                                    text: item.message.txt,
+                                    timestamp: item.timestamp
                                 })
                             }
                         }
                         if (item.message.role_type === 'user') {
                             logs.push({
                                 role: 'user',
-                                text: item.message.txt
+                                text: item.message.txt,
+                                timestamp: item.timestamp
                             })
                         }
                     }
@@ -40,8 +43,9 @@
                     console.log('cannot get logs')
                     return
                 }
-                const systemPrompt = logs.pop()
-                const result = [systemPrompt].concat(logs)
+                logs.sort((a, b) => {
+                    return a.timestamp - b.timestamp
+                })
                 const time = new Date()
                 const year = time.getFullYear()
                 const month = time.getMonth() + 1
