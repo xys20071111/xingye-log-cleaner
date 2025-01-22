@@ -4,38 +4,42 @@
     setTimeout(() => {
 
         const userid = parseInt(document.querySelectorAll('.ant-dropdown-menu-title-content')[0].childNodes[0].getAttribute('href').split('-').pop(), 10)
-        const npcid = parseInt(location.href.split('-').pop(), 10)
+        const npcid = location.href.split('-').pop()
 
-        const db = indexedDB.open(`LocalChatMessage_${userid}`)
+        const db = indexedDB.open(`ChatDatabase_${userid}`)
         db.onsuccess = () => {
             const connection = db.result
             const transaction = connection.transaction(connection.objectStoreNames)
-            const store = transaction.objectStore('data')
-            const request = store.get(npcid)
+            const store = transaction.objectStore(transaction.objectStoreNames[0])
+            const request = store.getAll()
             request.onsuccess = () => {
-                for (const item of request.result.data.messageList) {
-                    if (item.role_type === 'ai') {
-                        if (item.type !== 'intro') {
+                console.log(request.result)
+                for (const item of request.result)
+                    if (item.npcId === npcid) {
+                        if (item.message.role_type === 'ai') {
+                            if (item.type !== 'intro') {
+                                logs.push({
+                                    role: 'assistant',
+                                    text: item.message.txt
+                                })
+                            } else {
+                                logs.push({
+                                    role: 'system',
+                                    text: item.message.txt
+                                })
+                            }
+                        }
+                        if (item.message.role_type === 'user') {
                             logs.push({
-                                role: 'assistant',
-                                text: item.txt
-                            })
-                        } else {
-                            logs.push({
-                                role: 'system',
-                                text: item.txt
+                                role: 'user',
+                                text: item.message.txt
                             })
                         }
-                        continue
                     }
-                    if (item.role_type === 'user') {
-                        logs.push({
-                            role: 'user',
-                            text: item.txt
-                        })
-                    }
+                if (logs.length === 0) {
+                    console.log('cannot get logs')
+                    return
                 }
-
                 const time = new Date()
                 const year = time.getFullYear()
                 const month = time.getMonth() + 1
@@ -54,6 +58,5 @@
                 download.click()
             }
         }
-
     }, 1000)
 })()
