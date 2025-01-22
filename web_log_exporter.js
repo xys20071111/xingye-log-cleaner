@@ -17,7 +17,7 @@
                 for (const item of request.result)
                     if (item.npcId === npcid) {
                         if (item.message.role_type === 'ai') {
-                            if (item.type !== 'intro') {
+                            if (item.message.type !== 'intro') {
                                 logs.push({
                                     role: 'assistant',
                                     text: item.message.txt
@@ -40,6 +40,8 @@
                     console.log('cannot get logs')
                     return
                 }
+                const systemPrompt = logs.pop()
+                const result = [systemPrompt].concat(logs)
                 const time = new Date()
                 const year = time.getFullYear()
                 const month = time.getMonth() + 1
@@ -48,7 +50,7 @@
                 const minutes = time.getMinutes()
                 const second = time.getSeconds()
 
-                const blob = new Blob([JSON.stringify(logs, null, 4)], {
+                const blob = new Blob([JSON.stringify(result, null, 4)], {
                     type: 'application/json'
                 })
                 const url = URL.createObjectURL(blob)
