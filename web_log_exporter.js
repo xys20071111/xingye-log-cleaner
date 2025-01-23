@@ -62,7 +62,7 @@
                 const url = URL.createObjectURL(blob)
                 const download = document.createElement('a')
                 download.href = url
-                download.download = `chat-export-${npcName}-${year}-${month}-${day}-${hour}-${minutes}-${second}.json`
+                download.download = `chat-export-${decodeURIComponent(npcName)}-${year}-${month}-${day}-${hour}-${minutes}-${second}.json`
                 download.click()
             }
         }
