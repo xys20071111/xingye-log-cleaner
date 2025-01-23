@@ -4,7 +4,8 @@
     setTimeout(() => {
 
         const userid = parseInt(document.querySelectorAll('.ant-dropdown-menu-title-content')[0].childNodes[0].getAttribute('href').split('-').pop(), 10)
-        const npcid = location.href.split('-').pop()
+        const [npcName, npcId] = location.href.split('/').pop().split('-')
+        console.log(npcName, npcId)
 
         const db = indexedDB.open(`ChatDatabase_${userid}`)
         db.onsuccess = () => {
@@ -14,8 +15,8 @@
             const request = store.getAll()
             request.onsuccess = () => {
                 console.log(request.result)
-                for (const item of request.result)
-                    if (item.npcId === npcid) {
+                for (const item of request.result) {
+                    if (item.npcId === npcId) {
                         if (item.message.role_type === 'ai') {
                             if (item.message.type !== 'intro') {
                                 logs.push({
@@ -39,6 +40,7 @@
                             })
                         }
                     }
+                }
                 if (logs.length === 0) {
                     console.log('cannot get logs')
                     return
@@ -54,13 +56,13 @@
                 const minutes = time.getMinutes()
                 const second = time.getSeconds()
 
-                const blob = new Blob([JSON.stringify(result, null, 4)], {
+                const blob = new Blob([JSON.stringify(logs, null, 4)], {
                     type: 'application/json'
                 })
                 const url = URL.createObjectURL(blob)
                 const download = document.createElement('a')
                 download.href = url
-                download.download = `chat-export-${year}-${month}-${day}-${hour}-${minutes}-${second}.json`
+                download.download = `chat-export-${npcName}-${year}-${month}-${day}-${hour}-${minutes}-${second}.json`
                 download.click()
             }
         }
