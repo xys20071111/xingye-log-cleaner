@@ -1,5 +1,6 @@
 (function () {
     const logs = []
+    let systemPrompt = ''
     document.querySelectorAll('.ant-dropdown-trigger')[0].click()
     setTimeout(() => {
 
@@ -25,11 +26,7 @@
                                     timestamp: item.timestamp
                                 })
                             } else {
-                                logs.push({
-                                    role: 'system',
-                                    text: item.message.txt,
-                                    timestamp: item.timestamp
-                                })
+                                systemPrompt = item.message.txt
                             }
                         }
                         if (item.message.role_type === 'user') {
@@ -56,7 +53,10 @@
                 const minutes = time.getMinutes()
                 const second = time.getSeconds()
 
-                const blob = new Blob([JSON.stringify(logs, null, 4)], {
+                const blob = new Blob([JSON.stringify({
+                    system: systemPrompt,
+                    messages: log
+                }, null, 4)], {
                     type: 'application/json'
                 })
                 const url = URL.createObjectURL(blob)
